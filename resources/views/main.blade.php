@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="app">
+    <x-slot name="main">
         <App />
     </x-slot>
 </x-app-layout>
