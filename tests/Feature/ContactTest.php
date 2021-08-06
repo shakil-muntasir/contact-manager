@@ -8,6 +8,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 class ContactTest extends TestCase
 {
@@ -35,7 +36,7 @@ class ContactTest extends TestCase
     /** @test **/
     public function an_authenticated_user_can_create_a_contact()
     {
-        $this->actingAs($this->user, 'api');
+        Sanctum::actingAs($this->user);
 
         $response = $this->post('/api/contacts', array_merge($this->data(), ['note' => 'Some Notes']));
 
@@ -53,7 +54,7 @@ class ContactTest extends TestCase
     /** @test **/
     public function some_fields_are_required()
     {
-        $this->actingAs($this->user, 'api');
+        Sanctum::actingAs($this->user);
 
         collect(['name', 'email', 'cellphone', 'birthdate'])->each(function ($field) {
             $response = $this->post('/api/contacts', array_merge($this->data(), [$field => '']));
@@ -67,7 +68,7 @@ class ContactTest extends TestCase
     /** @test **/
     public function some_fields_can_be_null()
     {
-        $this->actingAs($this->user, 'api');
+        Sanctum::actingAs($this->user);
 
         collect(['note'])->each(function ($field) {
             $response = $this->post('/api/contacts', array_merge($this->data(), [$field => '']));
@@ -81,7 +82,7 @@ class ContactTest extends TestCase
     /** @test **/
     public function email_should_be_properly_formatted()
     {
-        $this->actingAs($this->user, 'api');
+        Sanctum::actingAs($this->user);
 
         $response = $this->post('/api/contacts', array_merge($this->data(), ['email' => 'NOT AN EMAIL']));
 
@@ -93,7 +94,7 @@ class ContactTest extends TestCase
     /** @test **/
     public function birthdate_is_a_proper_date()
     {
-        $this->actingAs($this->user, 'api');
+        Sanctum::actingAs($this->user);
 
         $this->post('/api/contacts', $this->data());
 
@@ -104,7 +105,7 @@ class ContactTest extends TestCase
     /** @test **/
     public function only_the_user_can_retrieve_all_of_their_contacts()
     {
-        $this->actingAs($this->user, 'api');
+        Sanctum::actingAs($this->user);
 
         $anotherUser = User::factory()->create();
 
@@ -128,7 +129,7 @@ class ContactTest extends TestCase
     /** @test **/
     public function a_specific_contact_can_be_retrieved()
     {
-        $this->actingAs($this->user, 'api');
+        Sanctum::actingAs($this->user);
 
         $contact = Contact::factory()->create(['user_id' => $this->user->id]);
 
@@ -158,7 +159,7 @@ class ContactTest extends TestCase
     /** @test **/
     public function only_the_user_can_retrieve_their_single_contact()
     {
-        $this->actingAs($this->user, 'api');
+        Sanctum::actingAs($this->user);
         $anotherUser = User::factory()->create();
 
         $contact = Contact::factory()->create(['user_id' => $anotherUser->id]);
@@ -171,7 +172,7 @@ class ContactTest extends TestCase
     /** @test **/
     public function a_contact_can_be_updated()
     {
-        $this->actingAs($this->user, 'api');
+        Sanctum::actingAs($this->user);
 
         $contact = Contact::factory()->create(['user_id' => $this->user->id]);
 
@@ -190,7 +191,7 @@ class ContactTest extends TestCase
     /** @test **/
     public function only_the_user_can_update_their_contact()
     {
-        $this->actingAs($this->user, 'api');
+        Sanctum::actingAs($this->user);
         $anotherUser = User::factory()->create();
 
         $contact = Contact::factory()->create(['user_id' => $anotherUser->id]);
@@ -203,7 +204,7 @@ class ContactTest extends TestCase
     /** @test **/
     public function a_contact_can_be_deleted()
     {
-        $this->actingAs($this->user, 'api');
+        Sanctum::actingAs($this->user);
 
         $contact = Contact::factory()->create(['user_id' => $this->user->id]);
 
@@ -215,7 +216,7 @@ class ContactTest extends TestCase
     /** @test **/
     public function only_the_user_can_delete_their_contact()
     {
-        $this->actingAs($this->user, 'api');
+        Sanctum::actingAs($this->user);
         $anotherUser = User::factory()->create();
 
         $contact = Contact::factory()->create(['user_id' => $anotherUser->id]);
