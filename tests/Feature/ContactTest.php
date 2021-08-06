@@ -114,9 +114,14 @@ class ContactTest extends TestCase
         $response = $this->get('/api/contacts');
 
         $response->assertOk()
-            ->assertJsonCount(1)
             ->assertJson([
-                ['user_id' => $this->user->id],
+                'data' => [
+                    [
+                        'data' => [
+                            'id' => $this->user->id,
+                        ]
+                    ]
+                ]
             ]);
     }
 
@@ -131,19 +136,28 @@ class ContactTest extends TestCase
 
         $response->assertOk();
         $response->assertJson([
-            'user_id' => $this->user->id,
-            'name' => $contact->name,
-            'email' => $contact->email,
-            'cellphone' => $contact->cellphone,
-            'birthdate' => $contact->birthdate->toJson(),
-            'note' => $contact->note,
+            'data' => [
+                'type' => 'contacts',
+                'id' => $contact->id,
+                'attributes' => [
+                    'user' => $this->user->name,
+                    'name' => $contact->name,
+                    'email' => $contact->email,
+                    'cellphone' => $contact->cellphone,
+                    'birthdate' => $contact->birthdate->format('jS F, Y'),
+                    'note' => $contact->note,
+                    'updated_at' => $contact->updated_at->diffForHumans()
+                ],
+            ],
+            'links' => [
+                'self' => $contact->path()
+            ]
         ]);
     }
 
     /** @test **/
     public function only_the_user_can_retrieve_their_single_contact()
     {
-        // $this->withoutExceptionHandling();
         $this->actingAs($this->user, 'api');
         $anotherUser = User::factory()->create();
 
