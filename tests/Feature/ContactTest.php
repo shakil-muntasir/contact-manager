@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Contact;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -12,14 +13,36 @@ class ContactTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test **/
-    public function a_contact_can_be_created()
+    protected $user;
+
+    public function setUp(): void
     {
+        parent::setUp();
+
+        $this->user = User::factory()->create();
+    }
+
+    /** @test **/
+    public function an_unauthenticated_user_should_be_redirected_to_login_page()
+    {
+        $response = $this->post('/api/contacts', $this->data());
+
+        $response->assertRedirect('/login');
+        $this->assertGuest();
+        $this->assertCount(0, Contact::all());
+    }
+
+    /** @test **/
+    public function an_authenticated_user_can_create_a_contact()
+    {
+        $this->actingAs($this->user, 'api');
+
         $response = $this->post('/api/contacts', array_merge($this->data(), ['note' => 'Some Notes']));
 
         $response->assertCreated();
 
         $this->assertCount(1, Contact::all());
+        $this->assertEquals($this->user->id, Contact::first()->user->id);
         $this->assertEquals("Test Name", Contact::first()->name);
         $this->assertEquals("test@email.com", Contact::first()->email);
         $this->assertEquals("123-123-1234", Contact::first()->cellphone);
@@ -30,6 +53,8 @@ class ContactTest extends TestCase
     /** @test **/
     public function some_fields_are_required()
     {
+        $this->actingAs($this->user, 'api');
+
         collect(['name', 'email', 'cellphone', 'birthdate'])->each(function ($field) {
             $response = $this->post('/api/contacts', array_merge($this->data(), [$field => '']));
 
@@ -42,6 +67,8 @@ class ContactTest extends TestCase
     /** @test **/
     public function some_fields_can_be_null()
     {
+        $this->actingAs($this->user, 'api');
+
         collect(['note'])->each(function ($field) {
             $response = $this->post('/api/contacts', array_merge($this->data(), [$field => '']));
 
@@ -54,6 +81,8 @@ class ContactTest extends TestCase
     /** @test **/
     public function email_should_be_properly_formatted()
     {
+        $this->actingAs($this->user, 'api');
+
         $response = $this->post('/api/contacts', array_merge($this->data(), ['email' => 'NOT AN EMAIL']));
 
         $response->assertSessionHasErrors('email');
@@ -64,6 +93,8 @@ class ContactTest extends TestCase
     /** @test **/
     public function birthdate_is_a_proper_date()
     {
+        $this->actingAs($this->user, 'api');
+
         $this->post('/api/contacts', $this->data());
 
         $this->assertInstanceOf(Carbon::class, Contact::first()->birthdate);
@@ -71,25 +102,36 @@ class ContactTest extends TestCase
     }
 
     /** @test **/
-    public function all_contacts_can_be_retrieved()
+    public function only_the_user_can_retrieve_all_of_their_contacts()
     {
-        Contact::factory()->count(3)->create();
+        $this->actingAs($this->user, 'api');
+
+        $anotherUser = User::factory()->create();
+
+        Contact::factory()->create(['user_id' => $this->user->id]);
+        Contact::factory()->count(2)->create(['user_id' => $anotherUser->id]);
 
         $response = $this->get('/api/contacts');
 
-        $response->assertOk();
-        $response->assertJsonCount(3);
+        $response->assertOk()
+            ->assertJsonCount(1)
+            ->assertJson([
+                ['user_id' => $this->user->id],
+            ]);
     }
 
     /** @test **/
     public function a_specific_contact_can_be_retrieved()
     {
-        $contact = Contact::factory()->create();
+        $this->actingAs($this->user, 'api');
+
+        $contact = Contact::factory()->create(['user_id' => $this->user->id]);
 
         $response = $this->get('/api/contacts/' . $contact->id);
 
         $response->assertOk();
         $response->assertJson([
+            'user_id' => $this->user->id,
             'name' => $contact->name,
             'email' => $contact->email,
             'cellphone' => $contact->cellphone,
@@ -99,14 +141,31 @@ class ContactTest extends TestCase
     }
 
     /** @test **/
+    public function only_the_user_can_retrieve_their_single_contact()
+    {
+        // $this->withoutExceptionHandling();
+        $this->actingAs($this->user, 'api');
+        $anotherUser = User::factory()->create();
+
+        $contact = Contact::factory()->create(['user_id' => $anotherUser->id]);
+
+        $response = $this->get('/api/contacts/' . $contact->id);
+
+        $response->assertForbidden();
+    }
+
+    /** @test **/
     public function a_contact_can_be_updated()
     {
-        $contact = Contact::factory()->create();
+        $this->actingAs($this->user, 'api');
+
+        $contact = Contact::factory()->create(['user_id' => $this->user->id]);
 
         $this->patch('/api/contacts/' . $contact->id, $this->data());
 
         $contact = $contact->fresh();
 
+        $this->assertEquals($this->user->id, $contact->user->id);
         $this->assertEquals('Test Name', $contact->name);
         $this->assertEquals("test@email.com", $contact->email);
         $this->assertEquals("123-123-1234", $contact->cellphone);
@@ -115,13 +174,41 @@ class ContactTest extends TestCase
     }
 
     /** @test **/
+    public function only_the_user_can_update_their_contact()
+    {
+        $this->actingAs($this->user, 'api');
+        $anotherUser = User::factory()->create();
+
+        $contact = Contact::factory()->create(['user_id' => $anotherUser->id]);
+
+        $response = $this->patch('/api/contacts/' . $contact->id, $this->data());
+
+        $response->assertForbidden();
+    }
+
+    /** @test **/
     public function a_contact_can_be_deleted()
     {
-        $contact = Contact::factory()->create();
+        $this->actingAs($this->user, 'api');
+
+        $contact = Contact::factory()->create(['user_id' => $this->user->id]);
 
         $this->delete('/api/contacts/' . $contact->id);
 
         $this->assertCount(0, Contact::all());
+    }
+
+    /** @test **/
+    public function only_the_user_can_delete_their_contact()
+    {
+        $this->actingAs($this->user, 'api');
+        $anotherUser = User::factory()->create();
+
+        $contact = Contact::factory()->create(['user_id' => $anotherUser->id]);
+
+        $response =  $this->delete('/api/contacts/' . $contact->id);
+
+        $response->assertForbidden();
     }
 
     private function data()

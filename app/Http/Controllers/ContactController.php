@@ -10,31 +10,45 @@ class ContactController extends Controller
 {
     public function index()
     {
-        return Contact::all();
+        return request()->user()->contacts;
     }
 
     public function store()
     {
-        return Contact::create($this->validateData());
+        $contact = request()->user()->contacts()->create($this->validateData());
+
+        return $contact;
     }
 
     public function show(Contact $contact)
     {
-        return $contact;
+        if (request()->user()->is($contact->user)) {
+            return $contact;
+        }
+
+        return response(null, Response::HTTP_FORBIDDEN);
     }
 
     public function update(Contact $contact)
     {
-        $contact->update($this->validateData());
+        if (request()->user()->is($contact->user)) {
+            $contact->update($this->validateData());
 
-        return $contact;
+            return $contact;
+        }
+
+        return response(null, Response::HTTP_FORBIDDEN);
     }
 
     public function destroy(Contact $contact)
     {
-        $contact->delete();
+        if (request()->user()->is($contact->user)) {
+            $contact->delete();
 
-        return response([], Response::HTTP_OK);
+            return response(null, Response::HTTP_OK);
+        }
+
+        return response(null, Response::HTTP_FORBIDDEN);
     }
 
     private function validateData()
