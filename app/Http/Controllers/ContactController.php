@@ -10,11 +10,15 @@ class ContactController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', Contact::class);
+
         return request()->user()->contacts;
     }
 
     public function store()
     {
+        $this->authorize('create', Contact::class);
+
         $contact = request()->user()->contacts()->create($this->validateData());
 
         return $contact;
@@ -22,33 +26,25 @@ class ContactController extends Controller
 
     public function show(Contact $contact)
     {
-        if (request()->user()->is($contact->user)) {
-            return $contact;
-        }
+        $this->authorize('view', $contact);
 
-        return response(null, Response::HTTP_FORBIDDEN);
+        return $contact;
     }
 
     public function update(Contact $contact)
     {
-        if (request()->user()->is($contact->user)) {
-            $contact->update($this->validateData());
+        $this->authorize('update', $contact);
 
-            return $contact;
-        }
-
-        return response(null, Response::HTTP_FORBIDDEN);
+        return $contact->update($this->validateData());
     }
 
     public function destroy(Contact $contact)
     {
-        if (request()->user()->is($contact->user)) {
-            $contact->delete();
+        $this->authorize('delete', $contact);
 
-            return response(null, Response::HTTP_OK);
-        }
+        return $contact->delete();
 
-        return response(null, Response::HTTP_FORBIDDEN);
+        return response(null, Response::HTTP_OK);
     }
 
     private function validateData()
