@@ -4,8 +4,7 @@
         <div class="flex-1 flex flex-col h-screen overflow-y-hidden">
             <Topbar />
             <Content>
-                <!-- Appending the content in main content layout --->
-                <slot></slot>
+                <router-view />
             </Content>
         </div>
     </div>
