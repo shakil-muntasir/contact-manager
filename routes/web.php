@@ -5,4 +5,4 @@ use App\Http\Controllers\AppController;
 
 require __DIR__ . '/auth.php';
 
-Route::get('/{any}', [AppController::class, 'index'])->where('any', '.*');
+Route::middleware('auth')->get('/{any}', [AppController::class, 'index'])->where('any', '.*');
