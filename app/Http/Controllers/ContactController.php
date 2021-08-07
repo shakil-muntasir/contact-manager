@@ -14,7 +14,7 @@ class ContactController extends Controller
     {
         $this->authorize('viewAny', Contact::class);
 
-        $contacts = request()->user()->contacts;
+        $contacts = request()->user()->contacts()->latest()->get();
 
         return new ContactCollection($contacts);
     }
@@ -39,7 +39,9 @@ class ContactController extends Controller
     {
         $this->authorize('update', $contact);
 
-        $contact = $contact->update($this->validateData());
+        $contact->update($this->validateData());
+
+        $contact = $contact->fresh();
 
         return new ContactResource($contact);
     }
@@ -48,7 +50,7 @@ class ContactController extends Controller
     {
         $this->authorize('delete', $contact);
 
-        return $contact->delete();
+        $contact->delete();
 
         return response([], Response::HTTP_OK);
     }
