@@ -1,6 +1,5 @@
 <template>
-    <template v-if="!loaded"></template>
-    <router-view v-else />
+    <router-view v-if="loaded" />
 </template>
 
 <script>
@@ -13,16 +12,10 @@ export default {
         };
     },
 
-    created() {
-        this.getAuthUser();
-    },
+    async created() {
+        await this.$store.dispatch("fetchAuthUser");
 
-    methods: {
-        async getAuthUser() {
-            await this.$store.dispatch("fetchAuthUser");
-
-            return (this.loaded = true);
-        },
+        this.loaded = true;
     },
 
     watch: {

@@ -28,12 +28,12 @@
                         hover:border-gray-200
                         text-white
                     "
-                    @click="$emit('cancel')"
+                    @click.prevent="$emit('cancel')"
                 >
                     Cancel
                 </button>
                 <button
-                    @click="$emit('delete')"
+                    @click.prevent="$emit('delete')"
                     class="
                         ml-3
                         px-3

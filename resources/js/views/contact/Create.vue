@@ -42,7 +42,7 @@
 
         <div class="flex justify-end">
             <button
-                @click="$router.replace('/contacts')"
+                @click.prevent="$router.replace('/contacts')"
                 class="
                     px-3
                     py-2

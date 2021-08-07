@@ -1,6 +1,5 @@
 <template>
-    <template v-if="!loaded"></template>
-    <template v-else>
+    <template v-if="loaded">
         <div class="flex w-full justify-between items-center">
             <div>
                 <button

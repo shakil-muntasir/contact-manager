@@ -1,7 +1,5 @@
 <template>
-    <template v-if="!loaded"> </template>
-
-    <div v-else>
+    <template v-if="loaded">
         <div class="text-2xl" v-if="contacts.data.length === 0">
             No contacts found.
             <router-link class="text-blue-600" to="/contacts/create"
@@ -15,9 +13,7 @@
             :to="contact.links.self"
             class="flex items-center w-full border-b border-gray-300 py-2 mb-2"
         >
-            <div>
-                <UserCircle :name="contact.data.attributes.name" />
-            </div>
+            <UserCircle :name="contact.data.attributes.name" />
 
             <div class="ml-3 font-semibold text-gray-700">
                 <p>
@@ -29,7 +25,7 @@
                 <p>{{ contact.data.attributes.cellphone }}</p>
             </div>
         </router-link>
-    </div>
+    </template>
 </template>
 
 <script>
