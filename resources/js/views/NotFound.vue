@@ -75,13 +75,5 @@
 <script>
 export default {
     name: "NotFound",
-    watch: {
-        $route: {
-            immediate: true,
-            handler(to, from) {
-                document.title = to.meta.title || "404 | Contact Manager";
-            },
-        },
-    },
 };
 </script>

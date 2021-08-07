@@ -11,27 +11,25 @@
     >
         <div>Contacts</div>
 
-        <div
-            class="
-                flex
-                items-center
-                justify-center
-                rounded-full
-                bg-blue-600
-                text-white
-                font-bold
-                h-10
-                w-10
-                border border-gray-300
-            "
-        >
-            SM
-        </div>
+        <UserCircle :name="user.data.attributes.name" />
     </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+import UserCircle from "./UserCircle.vue";
+
 export default {
     name: "Topbar",
+
+    components: {
+        UserCircle,
+    },
+
+    computed: {
+        ...mapGetters({
+            user: "getUser",
+        }),
+    },
 };
 </script>

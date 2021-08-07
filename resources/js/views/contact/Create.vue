@@ -4,36 +4,45 @@
             name="name"
             label="Name"
             @update:input="form.name = $event"
+            :errors="errors"
             placeholder="Contact Name"
         />
+
         <Input
             name="email"
-            type="email"
             label="Email"
             @update:input="form.email = $event"
+            :errors="errors"
             placeholder="contact@email.com"
         />
+
         <Input
             name="cellphone"
             label="Cellphone"
             @update:input="form.cellphone = $event"
+            :errors="errors"
             placeholder="+1 23-123-1234"
         />
+
         <Input
             name="birthdate"
             label="Birthdate"
             @update:input="form.birthdate = $event"
+            :errors="errors"
             placeholder="DD-MM-YYYY"
         />
+
         <Input
             name="note"
             label="Note"
             @update:input="form.note = $event"
+            :errors="errors"
             placeholder="Your Note"
         />
 
         <div class="flex justify-end">
             <button
+                @click="$router.replace('/contacts')"
                 class="
                     px-3
                     py-2
@@ -82,6 +91,8 @@ export default {
                 birthdate: "",
                 note: "",
             },
+            errors: null,
+            contact: null,
         };
     },
 
@@ -89,8 +100,11 @@ export default {
         submitContact() {
             axios
                 .post("/api/contacts", this.form)
-                .then((response) => console.log(response.data))
-                .catch((error) => console.log(error.response.data));
+                .then((response) => {
+                    this.contact = response.data;
+                    this.$router.push(this.contact.links.self);
+                })
+                .catch((error) => (this.errors = error.response.data.errors));
         },
     },
 };

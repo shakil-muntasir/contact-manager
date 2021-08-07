@@ -44,7 +44,7 @@
         <h3 class="mt-12 uppercase text-xs font-bold text-gray-500">General</h3>
 
         <router-link
-            to="/"
+            to="/contacts"
             class="mt-2 flex items-center text-gray-900 hover:text-blue-600"
         >
             <svg

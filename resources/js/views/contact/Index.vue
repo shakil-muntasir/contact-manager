@@ -1,23 +1,63 @@
 <template>
-    <div v-for="i in 100" :key="i">
-        <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam eum
-            accusamus deserunt eaque cumque accusantium, ut animi voluptate
-            saepe ducimus hic fuga expedita dolore quis aliquid excepturi, odio
-            obcaecati nihil, perferendis tempora?
-        </p>
+    <template v-if="!loaded"> </template>
+
+    <div v-else>
+        <div class="text-2xl" v-if="contacts.data.length === 0">
+            No contacts found.
+            <router-link class="text-blue-600" to="/contacts/create"
+                >Get Started?</router-link
+            >
+        </div>
+        <router-link
+            v-else
+            v-for="contact in contacts.data"
+            :key="contact.data.id"
+            :to="contact.links.self"
+            class="flex items-center w-full border-b border-gray-300 py-2 mb-2"
+        >
+            <div>
+                <UserCircle :name="contact.data.attributes.name" />
+            </div>
+
+            <div class="ml-3 font-semibold text-gray-700">
+                <p>
+                    <span class="text-blue-600 text-base">{{
+                        contact.data.attributes.name
+                    }}</span>
+                    ({{ contact.data.attributes.email }})
+                </p>
+                <p>{{ contact.data.attributes.cellphone }}</p>
+            </div>
+        </router-link>
     </div>
 </template>
 
 <script>
+import axios from "axios";
+import UserCircle from "../../components/UserCircle.vue";
 export default {
     name: "ContactIndex",
 
-    $route: {
-        immediate: true,
-        handler(to, from) {
-            document.title = to.meta.title || "Contact Manager";
-        },
+    data() {
+        return {
+            contacts: [],
+            loaded: false,
+        };
+    },
+
+    components: {
+        UserCircle,
+    },
+
+    mounted() {
+        axios
+            .get("/api/contacts")
+            .then((response) => {
+                this.contacts = response.data;
+
+                this.loaded = true;
+            })
+            .catch((error) => {});
     },
 };
 </script>

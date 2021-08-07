@@ -1,18 +1,9 @@
 import { createStore } from "vuex";
 
+import user from "./modules/user";
+
 const modules = {
-    module: {
-        state() {
-            return {
-                test: "It works!",
-            };
-        },
-        getters: {
-            getTest: (state) => state.test,
-        },
-        mutations: {},
-        actions: {},
-    },
+    user,
 };
 
 const store = createStore({
