@@ -11,16 +11,16 @@
 </template>
 
 <script>
-import Navigation from "./Navigation.vue";
-import Topbar from "./Topbar.vue";
-import Content from "./Content.vue";
+import Navigation from './Navigation.vue'
+import Topbar from './Topbar.vue'
+import Content from './Content.vue'
 export default {
-    name: "Layout",
+    name: 'Layout',
 
     components: {
         Navigation,
         Topbar,
-        Content,
-    },
-};
+        Content
+    }
+}
 </script>

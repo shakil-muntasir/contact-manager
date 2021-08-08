@@ -1,37 +1,24 @@
 <template>
-    <div
-        class="
-            flex
-            items-center
-            justify-center
-            rounded-full
-            bg-blue-600
-            text-white
-            font-bold
-            h-10
-            w-10
-            border border-gray-300
-        "
-    >
+    <div class="flex items-center justify-center rounded-full bg-blue-600 text-white font-bold h-10 w-10 border border-gray-300">
         {{ initials }}
     </div>
 </template>
 
 <script>
 export default {
-    name: "UserCircle",
+    name: 'UserCircle',
 
-    props: ["name"],
+    props: ['name'],
 
     computed: {
         initials() {
             return this.name
-                .split(" ")
-                .map((word) => word[0])
-                .join("")
+                .split(' ')
+                .map(word => word[0])
+                .join('')
                 .slice(0, 2)
-                .toUpperCase();
-        },
-    },
-};
+                .toUpperCase()
+        }
+    }
+}
 </script>

@@ -1,36 +1,38 @@
 <template>
-    <router-view v-if="loaded" />
+    <div>
+        <router-view v-if="loaded" />
+    </div>
 </template>
 
 <script>
 export default {
-    name: "App",
+    name: 'App',
 
     data() {
         return {
-            loaded: false,
-        };
+            loaded: false
+        }
     },
 
     async created() {
-        await this.$store.dispatch("fetchAuthUser");
+        await this.$store.dispatch('fetchAuthUser')
 
-        this.loaded = true;
+        this.loaded = true
     },
 
     watch: {
         $route: {
             immediate: true,
             handler(to, from) {
-                let title = "Contact Manager";
+                let title = 'Contact Manager'
 
                 if (to.meta.title !== undefined) {
-                    title = `${to.meta.title} | Contact Manager`;
+                    title = `${to.meta.title} | Contact Manager`
                 }
 
-                document.title = title;
-            },
-        },
-    },
-};
+                document.title = title
+            }
+        }
+    }
+}
 </script>
