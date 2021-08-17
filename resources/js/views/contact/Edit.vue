@@ -1,5 +1,5 @@
 <template>
-    <form v-if="loaded" @submit.prevent="submitContact">
+    <form @submit.prevent="updateContact">
         <Input name="name" label="Name" :data="form.name" @update:input="form.name = $event" :errors="errors" placeholder="Contact Name" />
 
         <Input name="email" label="Email" :data="form.email" @update:input="form.email = $event" :errors="errors" placeholder="contact@email.com" />
@@ -11,61 +11,41 @@
         <Input name="note" label="Note" :data="form.note" @update:input="form.note = $event" :errors="errors" placeholder="Your Note" />
 
         <div class="flex justify-end">
-            <button @click.prevent="$router.replace('/contacts')" class="px-3 py-2 rounded border border-red-600 text-red-600 text-sm hover:bg-red-600 hover:text-white">Cancel</button>
-            <button type="submit" class="ml-2 px-3 py-2 rounded bg-blue-600 text-white text-sm hover:bg-blue-500">Update Contact</button>
+            <button @click.prevent="router.replace('/contacts')" class="px-3 py-2 text-sm text-red-600 border border-red-600 rounded hover:bg-red-600 hover:text-white">Cancel</button>
+            <button type="submit" class="px-3 py-2 ml-2 text-sm text-white bg-blue-600 rounded hover:bg-blue-500">Update Contact</button>
         </div>
     </form>
 </template>
 
-<script>
-import axios from 'axios'
+<script setup>
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 import Input from '../../components/Input.vue'
-export default {
-    name: 'Edit',
 
-    components: {
-        Input
-    },
+const store = useStore()
+const route = useRoute()
+const router = useRouter()
+const form = computed(() => store.getters.getContactForm)
+const contact = computed(() => store.getters.getContact)
+const errors = computed(() => store.getters.getContactErrors)
 
-    data() {
-        return {
-            form: {
-                name: '',
-                email: '',
-                cellphone: '',
-                birthdate: '',
-                note: ''
-            },
-            errors: null,
-            loaded: false
-        }
-    },
-
-    mounted() {
-        axios
-            .get(`/api/contacts/${this.$route.params.id}`)
-            .then(response => {
-                this.form = response.data.data.attributes
-                this.loaded = true
-            })
-            .catch(error => {
-                if (error.response.status === 404) {
-                    this.$router.replace('/error')
-                }
-            })
-    },
-
-    methods: {
-        submitContact() {
-            axios
-                .patch(`/api/contacts/${this.$route.params.id}`, this.form)
-                .then(response => {
-                    this.$router.push(response.data.links.self)
-                })
-                .catch(error => {
-                    this.errors = error.response.data.errors
-                })
-        }
+try {
+    await store.dispatch('fetchContactForm', route.params.id)
+} catch (error) {
+    if (error.response.status === 404) {
+        router.replace('/error')
     }
+}
+
+const updateContact = async () => {
+    const payload = {
+        contact_id: route.params.id,
+        payload: { ...form.value }
+    }
+    try {
+        await store.dispatch('updateContact', payload)
+        router.push(contact.value.links.self)
+    } catch (error) {}
 }
 </script>

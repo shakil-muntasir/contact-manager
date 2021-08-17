@@ -1,10 +1,12 @@
 <template>
     <div class="flex">
         <Navigation />
-        <div class="flex-1 flex flex-col h-screen overflow-y-hidden">
+        <div class="flex flex-col flex-1 h-screen overflow-y-hidden">
             <Topbar />
             <Content>
-                <router-view />
+                <Suspense>
+                    <router-view />
+                </Suspense>
             </Content>
         </div>
     </div>

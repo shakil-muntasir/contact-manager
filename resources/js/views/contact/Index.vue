@@ -1,15 +1,15 @@
 <template>
-    <div v-if="loaded">
+    <div>
         <div class="text-2xl" v-if="contacts.data.length === 0">
             No contacts found.
             <router-link class="text-blue-600" to="/contacts/create">Get Started?</router-link>
         </div>
-        <router-link v-else v-for="contact in contacts.data" :key="contact.data.id" :to="contact.links.self" class="flex items-center w-full border-b border-gray-300 py-2 mb-2">
+        <router-link v-else v-for="contact in contacts.data" :key="contact.data.id" :to="contact.links.self" class="flex items-center w-full py-2 mb-2 border-b border-gray-300">
             <UserCircle :name="contact.data.attributes.name" />
 
             <div class="ml-3 font-semibold text-gray-700">
                 <p>
-                    <span class="text-blue-600 text-base">{{ contact.data.attributes.name }}</span>
+                    <span class="text-base text-blue-600">{{ contact.data.attributes.name }}</span>
                     ({{ contact.data.attributes.email }})
                 </p>
                 <p>{{ contact.data.attributes.cellphone }}</p>
@@ -18,32 +18,14 @@
     </div>
 </template>
 
-<script>
-import axios from 'axios'
+<script setup>
+import { computed } from 'vue'
+import { useStore } from 'vuex'
 import UserCircle from '../../components/UserCircle.vue'
-export default {
-    name: 'ContactIndex',
 
-    data() {
-        return {
-            contacts: [],
-            loaded: false
-        }
-    },
+const store = useStore()
 
-    components: {
-        UserCircle
-    },
+await store.dispatch('fetchContacts')
 
-    mounted() {
-        axios
-            .get('/api/contacts')
-            .then(response => {
-                this.contacts = response.data
-
-                this.loaded = true
-            })
-            .catch(error => {})
-    }
-}
+const contacts = computed(() => store.getters.getContacts)
 </script>
