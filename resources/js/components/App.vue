@@ -1,38 +1,22 @@
 <template>
     <div>
-        <router-view v-if="loaded" />
+        <router-view />
     </div>
 </template>
 
-<script>
-export default {
-    name: 'App',
+<script setup>
+import { watch } from 'vue'
+import { useRoute } from 'vue-router'
 
-    data() {
-        return {
-            loaded: false
-        }
-    },
+const route = useRoute()
 
-    async created() {
-        await this.$store.dispatch('fetchAuthUser')
+watch(route, (to, from) => {
+    let title = 'Contact Manager'
 
-        this.loaded = true
-    },
-
-    watch: {
-        $route: {
-            immediate: true,
-            handler(to, from) {
-                let title = 'Contact Manager'
-
-                if (to.meta.title !== undefined) {
-                    title = `${to.meta.title} | Contact Manager`
-                }
-
-                document.title = title
-            }
-        }
+    if (to.meta.title !== undefined) {
+        title = `${to.meta.title} | Contact Manager`
     }
-}
+
+    document.title = title
+})
 </script>

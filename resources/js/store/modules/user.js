@@ -1,29 +1,34 @@
-import axios from "axios";
+import axios from 'axios'
 
 export default {
     state() {
         return {
-            user: null,
-        };
+            user: null
+        }
     },
     getters: {
-        getUser: (state) => state.user,
+        getUser: state => state.user
     },
     mutations: {
-        setUser: (state, payload) => (state.user = payload),
+        setUser: (state, payload) => (state.user = payload)
     },
     actions: {
-        fetchAuthUser: ({ state, commit }) => {
-            return new Promise((resolve, reject) => {
-                axios
-                    .get("/api/user")
-                    .then((response) => {
-                        commit("setUser", response.data);
+        fetchAuthUser: ({ commit }) => {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const response = await axios.get('/api/user')
 
-                        resolve(response.data);
-                    })
-                    .catch((error) => reject(error.response.data));
-            });
+                    commit('setUser', response.data)
+
+                    resolve(response)
+                } catch (error) {
+                    reject(error)
+                }
+            })
         },
-    },
-};
+        logoutAuthUser: async () => {
+            await axios.post('/logout')
+            window.location.replace('/login')
+        }
+    }
+}

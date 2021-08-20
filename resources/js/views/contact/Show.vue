@@ -58,12 +58,14 @@
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'
+
 import UserCircle from '../../components/UserCircle.vue'
 import Modal from '../../components/Modal.vue'
 
 const store = useStore()
 const route = useRoute()
 const router = useRouter()
+
 const toggleModal = ref(false)
 
 await store.dispatch('fetchContact', route.params.id)

@@ -38,15 +38,10 @@
     </nav>
 </template>
 
-<script>
-import axios from 'axios'
-export default {
-    name: 'Navigaton',
+<script setup>
+import { useStore } from 'vuex'
 
-    methods: {
-        logout() {
-            axios.post('/logout').finally(() => window.location.replace('/login'))
-        }
-    }
-}
+const store = useStore()
+
+const logout = () => store.dispatch('logoutAuthUser')
 </script>

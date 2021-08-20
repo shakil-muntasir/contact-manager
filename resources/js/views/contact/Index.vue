@@ -21,6 +21,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
+
 import UserCircle from '../../components/UserCircle.vue'
 
 const store = useStore()

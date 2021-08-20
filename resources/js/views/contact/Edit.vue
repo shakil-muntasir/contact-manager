@@ -19,13 +19,15 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { useRoute, useRouter } from 'vue-router'
+
 import Input from '../../components/Input.vue'
 
 const store = useStore()
 const route = useRoute()
 const router = useRouter()
+
 const form = computed(() => store.getters.getContactForm)
 const contact = computed(() => store.getters.getContact)
 const errors = computed(() => store.getters.getContactErrors)
@@ -43,9 +45,13 @@ const updateContact = async () => {
         contact_id: route.params.id,
         payload: { ...form.value }
     }
+    
     try {
         await store.dispatch('updateContact', payload)
+
         router.push(contact.value.links.self)
-    } catch (error) {}
+    } catch (error) {
+        console.log(error)
+    }
 }
 </script>

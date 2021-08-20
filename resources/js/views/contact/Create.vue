@@ -18,13 +18,15 @@
 </template>
 
 <script setup>
-import { useStore } from 'vuex'
 import { ref, computed } from 'vue'
+import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+
 import Input from '../../components/Input.vue'
 
 const store = useStore()
 const router = useRouter()
+
 const form = ref({
     name: '',
     email: '',
@@ -41,35 +43,4 @@ const submitContact = async () => {
         router.push(contact.value.links.self)
     } catch (error) {}
 }
-
-// export default {
-//     name: 'Create',
-
-//     components: {
-//         Input
-//     },
-
-//     data() {
-//         return {
-//             form: {
-//                 name: '',
-//                 email: '',
-//                 cellphone: '',
-//                 birthdate: '',
-//                 note: ''
-//             }
-//         }
-//     },
-
-//     computed: {
-//         ...mapGetters({
-//             contact: 'getContact',
-//             errors: 'getContactErrors'
-//         })
-//     },
-
-//     methods: {
-//
-//     }
-// }
 </script>

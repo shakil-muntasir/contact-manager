@@ -15,9 +15,6 @@
     </div>
 </template>
 
-<script>
-export default {
-    name: 'Modal',
-    emits: ['cancel', 'delete']
-}
+<script setup>
+const props = defineProps(['cancel', 'delete'])
 </script>

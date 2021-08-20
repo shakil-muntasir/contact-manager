@@ -8,52 +8,47 @@
     </div>
 </template>
 
-<script>
-export default {
-    name: 'Input',
-    props: ['name', 'label', 'placeholder', 'errors', 'data'],
-    data() {
-        return {
-            value: ''
-        }
-    },
+<script setup>
+import { ref, computed, watch } from 'vue'
 
-    computed: {
-        errorMessage() {
-            if (this.hasError) {
-                return this.errors[this.name][0]
-            }
-        },
+const props = defineProps(['name', 'label', 'placeholder', 'errors', 'data'])
 
-        classes() {
-            return {
-                'border-b border-gray-300 focus:border-blue-600': !this.hasError,
-                'border-b-2 focus:border-red-500 border-red-500': this.hasError
-            }
-        },
+const emit = defineEmits(['update:input'])
 
-        hasError() {
-            return this.errors != null && this.errors[this.name] && this.errors[this.name].length > 0
-        }
-    },
+const value = ref('')
 
-    methods: {
-        updateInput() {
-            this.$emit('update:input', this.value)
+const errorMessage = computed(() => {
+    if (hasError.value) {
+        return props.errors[props.name][0]
+    }
+})
 
-            if (this.hasError) {
-                this.errors[this.name] = null
-            }
-        }
-    },
+const hasError = computed(() => {
+    return props.errors != null && props.errors[props.name] && props.errors[props.name].length > 0
+})
 
-    watch: {
-        data: {
-            immediate: true,
-            handler(val) {
-                this.value = val
-            }
-        }
+const classes = computed(() => {
+    return {
+        'border-b border-gray-300 focus:border-blue-600': !hasError.value,
+        'border-b-2 focus:border-red-500 border-red-500': hasError.value
+    }
+})
+
+const updateInput = () => {
+    emit('update:input', value.value)
+
+    if (hasError.value) {
+        props.errors[props.name] = null
     }
 }
+
+watch(
+    () => props.data,
+    (data, prevData) => {
+        value.value = data
+    },
+    {
+        immediate: true
+    }
+)
 </script>
